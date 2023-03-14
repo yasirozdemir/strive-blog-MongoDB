@@ -31,6 +31,17 @@ blogpostsRouter.get("/", async (req, res, next) => {
 // GET BY ID
 blogpostsRouter.get("/:blogpostId", async (req, res, next) => {
   try {
+    const user = await BlogpostsModel.findById(req.params.blogpostId);
+    if (user) {
+      res.send(user);
+    } else {
+      next(
+        createHttpError(
+          404,
+          `Blogpost with id ${req.params.blogpostId} not found!`
+        )
+      );
+    }
   } catch (error) {
     next(error);
   }
