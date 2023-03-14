@@ -8,12 +8,15 @@ import {
   notFoundHandler,
   genericErrorHandler,
 } from "./errorHandlers.js";
+import blogpostsRouter from "./api/blogposts/index.js";
 
 const server = Express();
 const port = process.env.PORT || 3001;
 
 server.use(cors());
 server.use(Express.json());
+
+server.use("/blogposts", blogpostsRouter);
 
 server.use(badRequestHandler);
 server.use(unauthorizedHandler);
