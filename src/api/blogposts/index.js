@@ -21,6 +21,8 @@ blogpostsRouter.post("/", async (req, res, next) => {
 // GET
 blogpostsRouter.get("/", async (req, res, next) => {
   try {
+    const blogposts = await BlogpostsModel.find();
+    res.send(blogposts);
   } catch (error) {
     next(error);
   }
