@@ -58,6 +58,17 @@ blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
 // DELETE
 blogpostsRouter.delete("/:blogpostId", async (req, res, next) => {
   try {
+    const deletedUser = await BlogpostsModel.findByIdAndDelete(
+      req.params.blogpostId
+    );
+    if (deletedUser) res.status(204).send();
+    else
+      next(
+        createHttpError(
+          404,
+          `Blogpost with id ${req.params.blogpostId} not found!`
+        )
+      );
   } catch (error) {
     next(error);
   }
