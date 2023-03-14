@@ -51,16 +51,19 @@ blogpostsRouter.get("/:blogpostId", async (req, res, next) => {
 blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
   try {
     // Alternative 1
-    const updatedUser = await BlogpostsModel.findByIdAndUpdate(
-      req.params.blogpostId, // which one to update
-      req.body, // how to update
-      { new: true, runValidators: true }
-      // OPTIONS
-      // By default findByIdAndUpdate returns the record pre-modification. If you want to get the newly updated one you shall use new: true
-      // By default validation is off in the findByIdAndUpdate --> runValidators: true
-    );
+    // const updatedUser = await BlogpostsModel.findByIdAndUpdate(
+    //   req.params.blogpostId, // which one to update
+    //   req.body, // how to update
+    //   { new: true, runValidators: true }
+    //   // OPTIONS
+    //   // By default findByIdAndUpdate returns the record pre-modification. If you want to get the newly updated one you shall use new: true
+    //   // By default validation is off in the findByIdAndUpdate --> runValidators: true
+    // );
 
     // Alternative 2
+    const updatedUser = await BlogpostsModel.findById(req.params.blogpostId);
+    updatedUser.author.name = "Pasha the cat";
+    await updatedUser.save();
 
     if (updatedUser) res.send(updatedUser);
     else
