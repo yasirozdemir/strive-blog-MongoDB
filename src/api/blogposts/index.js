@@ -7,6 +7,12 @@ const blogpostsRouter = Express.Router();
 // POST
 blogpostsRouter.post("/", async (req, res, next) => {
   try {
+    const newBlogpost = new BlogpostsModel(req.body);
+    const { _id } = await newBlogpost.save();
+    res.status(201).send({
+      message: "New blogpost successfully published!",
+      id: _id,
+    });
   } catch (error) {
     next(error);
   }

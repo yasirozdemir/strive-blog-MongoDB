@@ -5,7 +5,7 @@ export const badRequestHandler = (err, req, res, next) => {
     // if there is a validation error, it will throw a bad req error
     res.status(400).send({
       message: err.message,
-      errors: err.errors?.map((e) => e.msg),
+      // errors: err.errors?.map((e) => e.msg),
     });
   } else if (err instanceof mongoose.Error.CastError) {
     // if there is a cast error related with id, it will throw a bad req error
