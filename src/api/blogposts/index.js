@@ -144,15 +144,27 @@ blogpostsRouter.post("/:blogpostId", async (req, res, next) => {
 // GET COMMENTS
 blogpostsRouter.get("/:blogpostId/comments", async (req, res, next) => {
   try {
-    const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
-    if (blogpost) res.send(blogpost.comments);
-    else
+    const queryToMongo = q2m(req.query);
+    const blogposts = await BlogpostsModel.find(queryToMongo.criteria);
+    const blogpost = blogposts.find(
+      (b) => b._id.toString() === req.params.blogpostId
+    );
+    if (blogposts.length > 0) {
+      // FOR NOW IT ONLY WORKS IF THERE IS EVEN ONE COMMENT THAT MATCHES THE CRITERIA, AND SHOWS ALL THE COMMENTS OF THE SPECIFIC BLOGPOST! FURTHER JS FUNC. IS NEEDED.
+      if (blogpost) {
+        res.send(blogpost.comments);
+      } else
+        next(
+          createHttpError(
+            404,
+            `Blogpost with id ${req.params.blogpostId} not found!`
+          )
+        );
+    } else {
       next(
-        createHttpError(
-          404,
-          `Blogpost with id ${req.params.blogpostId} not found!`
-        )
+        createHttpError(404, "There is no comment matches the criteria(s))!")
       );
+    }
   } catch (error) {
     next(error);
   }
