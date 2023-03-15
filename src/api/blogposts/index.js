@@ -188,6 +188,19 @@ blogpostsRouter.put(
 blogpostsRouter.delete(
   "/:blogpostId/comments/:commentId",
   async (req, res, next) => {
+    const updatedBlogpost = await BlogpostsModel.findByIdAndUpdate(
+      req.params.blogpostId,
+      { $pull: { comments: { _id: req.params.commentId } } },
+      { new: true, runValidators: true }
+    );
+    if (updatedBlogpost) res.status(204).send();
+    else
+      next(
+        createHttpError(
+          404,
+          `Blogpost with id ${req.params.blogpostId} not found!`
+        )
+      );
     try {
     } catch (error) {
       next(error);
