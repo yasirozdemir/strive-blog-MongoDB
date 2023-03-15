@@ -145,6 +145,28 @@ blogpostsRouter.get(
   "/:blogpostId/comments/:commentId",
   async (req, res, next) => {
     try {
+      const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+      if (blogpost) {
+        const comment = blogpost.comments.find(
+          (c) => c._id.toString() === req.params.commentId
+        );
+        if (comment) res.send(comment);
+        else {
+          next(
+            createHttpError(
+              404,
+              `Comment with id ${req.params.commentId} not found!`
+            )
+          );
+        }
+      } else {
+        next(
+          createHttpError(
+            404,
+            `Blogpost with id ${req.params.blogpostId} not found!`
+          )
+        );
+      }
     } catch (error) {
       next(error);
     }
