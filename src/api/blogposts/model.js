@@ -15,6 +15,17 @@ const blogpostSchema = new Schema(
       avatar: { type: String, required: true },
     },
     content: { type: String, required: true },
+    comments: [
+      {
+        author: {
+          name: { type: String, required: true },
+          surname: { type: String, required: true },
+          _id: { type: String, required: true },
+        },
+        rate: { type: Number, required: true },
+        comment: { type: String, required: true },
+      },
+    ],
   },
   {
     timestamps: true, // timestamps is false by default, by assigning it true makes MongoDB server to generate automatically createdAt and updatedAt
