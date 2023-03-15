@@ -110,7 +110,7 @@ blogpostsRouter.post("/:blogpostId", async (req, res, next) => {
       { $push: { comments: comment } },
       { new: true, runValidators: true }
     );
-    if (commentedBlogpost) res.send(commentedBlogpost);
+    if (commentedBlogpost) res.status(201).send(commentedBlogpost);
     else
       next(
         createHttpError(
@@ -126,6 +126,15 @@ blogpostsRouter.post("/:blogpostId", async (req, res, next) => {
 // GET COMMENTS
 blogpostsRouter.get("/:blogpostId/comments", async (req, res, next) => {
   try {
+    const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+    if (blogpost) res.send(blogpost.comments);
+    else
+      next(
+        createHttpError(
+          404,
+          `Blogpost with id ${req.params.blogpostId} not found!`
+        )
+      );
   } catch (error) {
     next(error);
   }
