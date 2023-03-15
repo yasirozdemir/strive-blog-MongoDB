@@ -24,6 +24,8 @@ const blogpostSchema = new Schema(
         },
         rate: { type: Number, required: true },
         comment: { type: String, required: true },
+        createdAt: { type: Date, required: true },
+        updatedAt: { type: Date, required: true },
       },
     ],
   },

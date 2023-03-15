@@ -105,7 +105,6 @@ blogpostsRouter.post("/:blogpostId", async (req, res, next) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    console.log(comment);
     const commentedBlogpost = await BlogpostsModel.findByIdAndUpdate(
       req.params.blogpostId,
       { $push: { comments: comment } },
