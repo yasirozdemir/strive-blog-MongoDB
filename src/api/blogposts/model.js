@@ -14,12 +14,9 @@ const blogpostSchema = new Schema(
         enum: ["second", "minute", "hour"],
       },
     },
-    author: {
-      name: { type: String, required: true },
-      avatar: { type: String, required: true },
-    },
+    author: { type: Schema.Types.ObjectId, ref: "Author" },
     content: { type: String, required: true },
-    likes: [{ type: Schema.Types.ObjectId, ref: "Author" }],
+    // likes: [{ type: Schema.Types.ObjectId, ref: "Author" }],
     comments: [
       {
         author: {
@@ -38,5 +35,18 @@ const blogpostSchema = new Schema(
     timestamps: true, // timestamps is false by default, by assigning it true makes MongoDB server to generate automatically createdAt and updatedAt
   }
 );
+
+blogpostSchema.static("findBlogpostAuthor", async function (mongoQuery) {
+  const blogposts = await this.find(
+    mongoQuery.criteria,
+    mongoQuery.options.fields
+  )
+    .limit(mongoQuery.options.limit)
+    .skip(mongoQuery.options.skip)
+    .sort(mongoQuery.options.sort)
+    .populate({ path: "author", select: "name surname" });
+  const totalNumOfBlogposts = await this.countDocuments(mongoQuery.criteria);
+  return { blogposts, totalNumOfBlogposts };
+});
 
 export default model("Blogpost", blogpostSchema);

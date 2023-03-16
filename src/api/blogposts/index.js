@@ -20,19 +20,38 @@ blogpostsRouter.post("/", async (req, res, next) => {
 });
 
 // GET
+// blogpostsRouter.get("/", async (req, res, next) => {
+//   try {
+//     const queryToMongo = q2m(req.query);
+//     const blogposts = await BlogpostsModel.find(
+//       queryToMongo.criteria,
+//       queryToMongo.options.fields
+//     )
+//       .limit(queryToMongo.options.limit)
+//       .skip(queryToMongo.options.skip)
+//       .sort(queryToMongo.options.sort);
+//     const totalNumOfBlogposts = await BlogpostsModel.countDocuments(
+//       queryToMongo.criteria
+//     );
+//     res.send({
+//       links: queryToMongo.links(
+//         "http://localhost:3001/blogposts",
+//         totalNumOfBlogposts
+//       ),
+//       totalNumOfBlogposts,
+//       blogposts,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// GET BLOGPOSTS INCLUDING AUTHORS DETAILS
 blogpostsRouter.get("/", async (req, res, next) => {
   try {
     const queryToMongo = q2m(req.query);
-    const blogposts = await BlogpostsModel.find(
-      queryToMongo.criteria,
-      queryToMongo.options.fields
-    )
-      .limit(queryToMongo.options.limit)
-      .skip(queryToMongo.options.skip)
-      .sort(queryToMongo.options.sort);
-    const totalNumOfBlogposts = await BlogpostsModel.countDocuments(
-      queryToMongo.criteria
-    );
+    const { blogposts, totalNumOfBlogposts } =
+      await BlogpostsModel.findBlogpostAuthor(queryToMongo);
     res.send({
       links: queryToMongo.links(
         "http://localhost:3001/blogposts",

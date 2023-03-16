@@ -27,7 +27,17 @@ authorsRouter.get("/", async (req, res, next) => {
       .limit(queryToMongo.options.limit)
       .skip(queryToMongo.options.skip)
       .sort(queryToMongo.options.sort);
-    res.send(authors);
+    const totalNumOfAuthors = await AuthorsModel.countDocuments(
+      queryToMongo.criteria
+    );
+    res.send({
+      links: queryToMongo.links(
+        "http://localhost:3001/authors",
+        totalNumOfAuthors
+      ),
+      totalNumOfAuthors,
+      authors,
+    });
   } catch (error) {
     next(error);
   }
