@@ -115,6 +115,34 @@ blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
   }
 });
 
+// LIKE A BLOGPOST
+blogpostsRouter.put("/:blogpostId/like", async (req, res, next) => {
+  try {
+    const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+    if (blogpost) {
+      if (!blogpost.likes.includes(req.body.authorId)) {
+        blogpost.likes.push(req.body.authorId);
+        await blogpost.save();
+        res.send({ likes: blogpost.likes, likesCount: blogpost.likes.length });
+      } else {
+        next(
+          createHttpError(
+            400,
+            `The same author can like the same blogpost just for once!`
+          )
+        );
+      }
+    } else {
+      createHttpError(
+        404,
+        `Blogpost with id ${req.params.blogpostId} not found!`
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 // DELETE
 blogpostsRouter.delete("/:blogpostId", async (req, res, next) => {
   try {
