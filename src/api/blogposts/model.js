@@ -8,13 +8,18 @@ const blogpostSchema = new Schema(
     cover: { type: String, required: true },
     readTime: {
       value: { type: Number, required: true },
-      unit: { type: String, required: true },
+      unit: {
+        type: String,
+        required: true,
+        enum: ["second", "minute", "hour"],
+      },
     },
     author: {
       name: { type: String, required: true },
       avatar: { type: String, required: true },
     },
     content: { type: String, required: true },
+    likes: [{ type: Schema.Types.ObjectId, ref: "Author" }],
     comments: [
       {
         author: {
