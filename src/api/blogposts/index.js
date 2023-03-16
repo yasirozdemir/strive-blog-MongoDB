@@ -19,7 +19,7 @@ blogpostsRouter.post("/", async (req, res, next) => {
   }
 });
 
-// GET
+// GET WITHOUT POPULATE
 // blogpostsRouter.get("/", async (req, res, next) => {
 //   try {
 //     const queryToMongo = q2m(req.query);
@@ -117,38 +117,75 @@ blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
   }
 });
 
-// LIKE OR DISLIKE A BLOGPOST (PURE JS WAY)
+// // LIKE OR DISLIKE A BLOGPOST (PURE JS WAY)
+// blogpostsRouter.put("/:blogpostId/likeOrDislike", async (req, res, next) => {
+//   try {
+//     const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+//     if (blogpost) {
+//       if (!blogpost.likes.includes(req.body.authorId)) {
+//         blogpost.likes.push(req.body.authorId);
+//         await blogpost.save();
+//         res.send({
+//           message: "Blogpost liked!",
+//           likes: blogpost.likes,
+//           likesCount: blogpost.likes.length,
+//         });
+//       } else {
+//         blogpost.likes = blogpost.likes.filter(
+//           (id) => id.toString() !== req.body.authorId
+//         );
+//         await blogpost.save();
+//         res.send({
+//           message: "Blogpost disliked!",
+//           likes: blogpost.likes,
+//           likesCount: blogpost.likes.length,
+//         });
+//       }
+//     } else {
+//       createHttpError(
+//         404,
+//         `Blogpost with id ${req.params.blogpostId} not found!`
+//       );
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// LIKE OR DISLIKE (MONGO WAY) thanks to -> https://github.com/batigokovali
 blogpostsRouter.put("/:blogpostId/likeOrDislike", async (req, res, next) => {
-  try {
-    const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
-    if (blogpost) {
-      if (!blogpost.likes.includes(req.body.authorId)) {
-        blogpost.likes.push(req.body.authorId);
-        await blogpost.save();
-        res.send({
-          message: "Blogpost liked!",
-          likes: blogpost.likes,
-          likesCount: blogpost.likes.length,
-        });
-      } else {
-        blogpost.likes = blogpost.likes.filter(
-          (id) => id.toString() !== req.body.authorId
-        );
-        await blogpost.save();
-        res.send({
-          message: "Blogpost disliked!",
-          likes: blogpost.likes,
-          likesCount: blogpost.likes.length,
-        });
-      }
-    } else {
-      createHttpError(
-        404,
-        `Blogpost with id ${req.params.blogpostId} not found!`
+  const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+  if (blogpost) {
+    if (!blogpost.likes.includes(req.body.authorId.toString())) {
+      const updatedBlogpost = await BlogpostsModel.findByIdAndUpdate(
+        req.params.blogpostId,
+        { $push: { likes: req.body.authorId } },
+        { new: true, runValidators: true }
       );
+      res.send({
+        message: "Blogpost liked!",
+        likes: updatedBlogpost.likes,
+        likesCount: updatedBlogpost.likes.length,
+        isLiked: true,
+      });
+    } else {
+      const updatedBlogpost = await BlogpostsModel.findByIdAndUpdate(
+        req.params.blogpostId,
+        { $pull: { likes: req.body.authorId } },
+        { new: true, runValidators: true }
+      );
+      res.send({
+        message: "Blogpost disliked!",
+        likes: updatedBlogpost.likes,
+        likesCount: updatedBlogpost.likes.length,
+        isLiked: false,
+      });
     }
-  } catch (error) {
-    next(error);
+  } else {
+    createHttpError(
+      404,
+      `Blogpost with id ${req.params.blogpostId} not found!`
+    );
   }
 });
 
