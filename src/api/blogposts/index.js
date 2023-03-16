@@ -49,9 +49,9 @@ blogpostsRouter.get("/", async (req, res, next) => {
 // GET BY ID
 blogpostsRouter.get("/:blogpostId", async (req, res, next) => {
   try {
-    const user = await BlogpostsModel.findById(req.params.blogpostId);
-    if (user) {
-      res.send(user);
+    const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+    if (blogpost) {
+      res.send(blogpost);
     } else {
       next(
         createHttpError(
@@ -69,7 +69,7 @@ blogpostsRouter.get("/:blogpostId", async (req, res, next) => {
 blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
   try {
     // Alternative 1
-    const updatedUser = await BlogpostsModel.findByIdAndUpdate(
+    const updatedBlogpost = await BlogpostsModel.findByIdAndUpdate(
       req.params.blogpostId, // which one to update
       req.body, // how to update
       { new: true, runValidators: true }
@@ -79,11 +79,11 @@ blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
     );
 
     // Alternative 2
-    // const updatedUser = await BlogpostsModel.findById(req.params.blogpostId);
-    // updatedUser.author.name = "Pasha the cat";
-    // await updatedUser.save();
+    // const updatedBlogpost = await BlogpostsModel.findById(req.params.blogpostId);
+    // updatedBlogpost.author.name = "Pasha the cat";
+    // await updatedBlogpost.save();
 
-    if (updatedUser) res.send(updatedUser);
+    if (updatedBlogpost) res.send(updatedBlogpost);
     else
       next(
         createHttpError(
@@ -99,10 +99,10 @@ blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
 // DELETE
 blogpostsRouter.delete("/:blogpostId", async (req, res, next) => {
   try {
-    const deletedUser = await BlogpostsModel.findByIdAndDelete(
+    const deletedBlogpost = await BlogpostsModel.findByIdAndDelete(
       req.params.blogpostId
     );
-    if (deletedUser) res.status(204).send();
+    if (deletedBlogpost) res.status(204).send();
     else
       next(
         createHttpError(
