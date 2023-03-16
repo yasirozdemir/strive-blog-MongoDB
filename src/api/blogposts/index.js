@@ -115,22 +115,29 @@ blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
   }
 });
 
-// LIKE A BLOGPOST
-blogpostsRouter.put("/:blogpostId/like", async (req, res, next) => {
+// LIKE OR DISLIKE A BLOGPOST (PURE JS WAY)
+blogpostsRouter.put("/:blogpostId/likeOrDislike", async (req, res, next) => {
   try {
     const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
     if (blogpost) {
       if (!blogpost.likes.includes(req.body.authorId)) {
         blogpost.likes.push(req.body.authorId);
         await blogpost.save();
-        res.send({ likes: blogpost.likes, likesCount: blogpost.likes.length });
+        res.send({
+          message: "Blogpost liked!",
+          likes: blogpost.likes,
+          likesCount: blogpost.likes.length,
+        });
       } else {
-        next(
-          createHttpError(
-            400,
-            `The same author can like the same blogpost just for once!`
-          )
+        blogpost.likes = blogpost.likes.filter(
+          (id) => id.toString() !== req.body.authorId
         );
+        await blogpost.save();
+        res.send({
+          message: "Blogpost disliked!",
+          likes: blogpost.likes,
+          likesCount: blogpost.likes.length,
+        });
       }
     } else {
       createHttpError(
@@ -142,6 +149,31 @@ blogpostsRouter.put("/:blogpostId/like", async (req, res, next) => {
     next(error);
   }
 });
+
+// // LIKE A BLOGPOST (MONGO WAY)
+// blogpostsRouter.put("/:blogpostId/like", async (req, res, next) => {
+//   try {
+//     const likedBlogpost = await BlogpostsModel.findByIdAndUpdate(
+//       req.params.blogpostId,
+//       { $push: { likes: req.body.authorId } },
+//       { new: true, runValidators: true }
+//     );
+//     if (likedBlogpost)
+//       res.send({
+//         likesCount: likedBlogpost.likes.length,
+//         likes: likedBlogpost.likes,
+//       });
+//     else
+//       next(
+//         createHttpError(
+//           404,
+//           `Blogpost with id ${req.params.blogpostId} not found!`
+//         )
+//       );
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 // DELETE
 blogpostsRouter.delete("/:blogpostId", async (req, res, next) => {

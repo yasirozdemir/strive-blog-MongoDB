@@ -7,5 +7,3 @@
 # TODOs
 
 - Add populate to GET by id
-- Edit like
-- Add dislike
