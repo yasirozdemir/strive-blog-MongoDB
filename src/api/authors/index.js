@@ -48,6 +48,16 @@ authorsRouter.get("/:authorId", async (req, res, next) => {
 
 authorsRouter.put("/:authorId", async (req, res, next) => {
   try {
+    const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
+      req.params.authorId,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (updatedAuthor) res.send(updatedAuthor);
+    else
+      next(
+        createHttpError(404, `Author with id ${req.params.authorId} not found!`)
+      );
   } catch (error) {
     next(error);
   }
