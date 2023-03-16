@@ -6,4 +6,4 @@
 
 # TODOs
 
-- Add populate to GET by id
+- Add populate for comments section

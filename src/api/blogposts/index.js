@@ -51,7 +51,7 @@ blogpostsRouter.get("/", async (req, res, next) => {
   try {
     const queryToMongo = q2m(req.query);
     const { blogposts, totalNumOfBlogposts } =
-      await BlogpostsModel.findBlogpostAuthor(queryToMongo);
+      await BlogpostsModel.findBlogpostsWithAuthor(queryToMongo);
     res.send({
       links: queryToMongo.links(
         "http://localhost:3001/blogposts",
@@ -68,7 +68,9 @@ blogpostsRouter.get("/", async (req, res, next) => {
 // GET BY ID
 blogpostsRouter.get("/:blogpostId", async (req, res, next) => {
   try {
-    const blogpost = await BlogpostsModel.findById(req.params.blogpostId);
+    const blogpost = await BlogpostsModel.findBlogPostWithAuthor(
+      req.params.blogpostId
+    );
     if (blogpost) {
       res.send(blogpost);
     } else {
@@ -149,31 +151,6 @@ blogpostsRouter.put("/:blogpostId/likeOrDislike", async (req, res, next) => {
     next(error);
   }
 });
-
-// // LIKE A BLOGPOST (MONGO WAY)
-// blogpostsRouter.put("/:blogpostId/like", async (req, res, next) => {
-//   try {
-//     const likedBlogpost = await BlogpostsModel.findByIdAndUpdate(
-//       req.params.blogpostId,
-//       { $push: { likes: req.body.authorId } },
-//       { new: true, runValidators: true }
-//     );
-//     if (likedBlogpost)
-//       res.send({
-//         likesCount: likedBlogpost.likes.length,
-//         likes: likedBlogpost.likes,
-//       });
-//     else
-//       next(
-//         createHttpError(
-//           404,
-//           `Blogpost with id ${req.params.blogpostId} not found!`
-//         )
-//       );
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 // DELETE
 blogpostsRouter.delete("/:blogpostId", async (req, res, next) => {

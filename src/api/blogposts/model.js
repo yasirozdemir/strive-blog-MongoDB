@@ -36,7 +36,7 @@ const blogpostSchema = new Schema(
   }
 );
 
-blogpostSchema.static("findBlogpostAuthor", async function (mongoQuery) {
+blogpostSchema.static("findBlogpostsWithAuthor", async function (mongoQuery) {
   const blogposts = await this.find(
     mongoQuery.criteria,
     mongoQuery.options.fields
@@ -48,6 +48,14 @@ blogpostSchema.static("findBlogpostAuthor", async function (mongoQuery) {
   // populate takes the ObjectId from blogpost.author, and brings all the data of the author that you "select"
   const totalNumOfBlogposts = await this.countDocuments(mongoQuery.criteria);
   return { blogposts, totalNumOfBlogposts };
+});
+
+blogpostSchema.static("findBlogPostWithAuthor", async function (id) {
+  const blogpost = await this.findById(id).populate({
+    path: "author likes",
+    select: "name surname",
+  });
+  return blogpost;
 });
 
 export default model("Blogpost", blogpostSchema);
