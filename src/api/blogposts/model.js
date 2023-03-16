@@ -19,11 +19,7 @@ const blogpostSchema = new Schema(
     likes: [{ type: Schema.Types.ObjectId, ref: "Author" }],
     comments: [
       {
-        author: {
-          name: { type: String, required: true },
-          surname: { type: String, required: true },
-          _id: { type: String, required: true },
-        },
+        author: { type: Schema.Types.ObjectId, ref: "Author" },
         rate: { type: Number, required: true },
         comment: { type: String, required: true },
         createdAt: Date,
@@ -44,7 +40,7 @@ blogpostSchema.static("findBlogpostsWithAuthor", async function (mongoQuery) {
     .limit(mongoQuery.options.limit)
     .skip(mongoQuery.options.skip)
     .sort(mongoQuery.options.sort)
-    .populate({ path: "author likes", select: "name surname" });
+    .populate({ path: "author likes comments.author", select: "name surname" });
   // populate takes the ObjectId from blogpost.author, and brings all the data of the author that you "select"
   const totalNumOfBlogposts = await this.countDocuments(mongoQuery.criteria);
   return { blogposts, totalNumOfBlogposts };
@@ -52,7 +48,7 @@ blogpostSchema.static("findBlogpostsWithAuthor", async function (mongoQuery) {
 
 blogpostSchema.static("findBlogPostWithAuthor", async function (id) {
   const blogpost = await this.findById(id).populate({
-    path: "author likes",
+    path: "author likes comments.author",
     select: "name surname",
   });
   return blogpost;
