@@ -2,13 +2,18 @@ import Express from "express";
 import createHttpError from "http-errors";
 import BlogpostsModel from "./model.js";
 import q2m from "query-to-mongo";
+import { basicAuth } from "../../lib/auth/basicAuth.js";
+import { adminOnly } from "../../lib/auth/admin.js";
 
 const blogpostsRouter = Express.Router();
 
 // POST
-blogpostsRouter.post("/", async (req, res, next) => {
+blogpostsRouter.post("/", basicAuth, async (req, res, next) => {
   try {
-    const newBlogpost = new BlogpostsModel(req.body);
+    const newBlogpost = new BlogpostsModel({
+      ...req.body,
+      author: req.author._id,
+    });
     const { _id } = await newBlogpost.save();
     res.status(201).send({
       message: "New blogpost successfully published!",
@@ -18,33 +23,6 @@ blogpostsRouter.post("/", async (req, res, next) => {
     next(error);
   }
 });
-
-// GET WITHOUT POPULATE
-// blogpostsRouter.get("/", async (req, res, next) => {
-//   try {
-//     const queryToMongo = q2m(req.query);
-//     const blogposts = await BlogpostsModel.find(
-//       queryToMongo.criteria,
-//       queryToMongo.options.fields
-//     )
-//       .limit(queryToMongo.options.limit)
-//       .skip(queryToMongo.options.skip)
-//       .sort(queryToMongo.options.sort);
-//     const totalNumOfBlogposts = await BlogpostsModel.countDocuments(
-//       queryToMongo.criteria
-//     );
-//     res.send({
-//       links: queryToMongo.links(
-//         "http://localhost:3001/blogposts",
-//         totalNumOfBlogposts
-//       ),
-//       totalNumOfBlogposts,
-//       blogposts,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 // GET BLOGPOSTS INCLUDING AUTHORS DETAILS
 blogpostsRouter.get("/", async (req, res, next) => {
@@ -87,35 +65,40 @@ blogpostsRouter.get("/:blogpostId", async (req, res, next) => {
 });
 
 // PUT
-blogpostsRouter.put("/:blogpostId", async (req, res, next) => {
-  try {
-    // Alternative 1
-    const updatedBlogpost = await BlogpostsModel.findByIdAndUpdate(
-      req.params.blogpostId, // which one to update
-      req.body, // how to update
-      { new: true, runValidators: true }
-      // OPTIONS
-      // By default findByIdAndUpdate returns the record pre-modification. If you want to get the newly updated one you shall use new: true
-      // By default validation is off in the findByIdAndUpdate --> runValidators: true
-    );
-
-    // Alternative 2
-    // const updatedBlogpost = await BlogpostsModel.findById(req.params.blogpostId);
-    // updatedBlogpost.author.name = "Pasha the cat";
-    // await updatedBlogpost.save();
-
-    if (updatedBlogpost) res.send(updatedBlogpost);
-    else
-      next(
-        createHttpError(
-          404,
-          `Blogpost with id ${req.params.blogpostId} not found!`
-        )
+blogpostsRouter.put(
+  "/:blogpostId",
+  basicAuth,
+  adminOnly,
+  async (req, res, next) => {
+    try {
+      // Alternative 1
+      const updatedBlogpost = await BlogpostsModel.findByIdAndUpdate(
+        req.params.blogpostId, // which one to update
+        req.body, // how to update
+        { new: true, runValidators: true }
+        // OPTIONS
+        // By default findByIdAndUpdate returns the record pre-modification. If you want to get the newly updated one you shall use new: true
+        // By default validation is off in the findByIdAndUpdate --> runValidators: true
       );
-  } catch (error) {
-    next(error);
+
+      // Alternative 2
+      // const updatedBlogpost = await BlogpostsModel.findById(req.params.blogpostId);
+      // updatedBlogpost.author.name = "Pasha the cat";
+      // await updatedBlogpost.save();
+
+      if (updatedBlogpost) res.send(updatedBlogpost);
+      else
+        next(
+          createHttpError(
+            404,
+            `Blogpost with id ${req.params.blogpostId} not found!`
+          )
+        );
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // // LIKE OR DISLIKE A BLOGPOST (PURE JS WAY)
 // blogpostsRouter.put("/:blogpostId/likeOrDislike", async (req, res, next) => {
@@ -190,23 +173,28 @@ blogpostsRouter.put("/:blogpostId/likeOrDislike", async (req, res, next) => {
 });
 
 // DELETE
-blogpostsRouter.delete("/:blogpostId", async (req, res, next) => {
-  try {
-    const deletedBlogpost = await BlogpostsModel.findByIdAndDelete(
-      req.params.blogpostId
-    );
-    if (deletedBlogpost) res.status(204).send();
-    else
-      next(
-        createHttpError(
-          404,
-          `Blogpost with id ${req.params.blogpostId} not found!`
-        )
+blogpostsRouter.delete(
+  "/:blogpostId",
+  basicAuth,
+  adminOnly,
+  async (req, res, next) => {
+    try {
+      const deletedBlogpost = await BlogpostsModel.findByIdAndDelete(
+        req.params.blogpostId
       );
-  } catch (error) {
-    next(error);
+      if (deletedBlogpost) res.status(204).send();
+      else
+        next(
+          createHttpError(
+            404,
+            `Blogpost with id ${req.params.blogpostId} not found!`
+          )
+        );
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // POST A COMMENT
 blogpostsRouter.post("/:blogpostId", async (req, res, next) => {
