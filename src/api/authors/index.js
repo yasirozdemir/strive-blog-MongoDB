@@ -19,7 +19,7 @@ authorsRouter.post("/", async (req, res, next) => {
   }
 });
 
-authorsRouter.get("/", basicAuth, adminOnly, async (req, res, next) => {
+authorsRouter.get("/", async (req, res, next) => {
   try {
     const queryToMongo = q2m(req.query);
     const authors = await AuthorsModel.find(
@@ -45,7 +45,7 @@ authorsRouter.get("/", basicAuth, adminOnly, async (req, res, next) => {
   }
 });
 
-authorsRouter.get("/:authorId", async (req, res, next) => {
+authorsRouter.get("/:authorId", basicAuth, async (req, res, next) => {
   try {
     const author = await AuthorsModel.findById(req.params.authorId);
     if (author) res.send(author);
