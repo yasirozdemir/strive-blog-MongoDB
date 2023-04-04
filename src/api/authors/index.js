@@ -58,36 +58,52 @@ authorsRouter.get("/:authorId", basicAuth, async (req, res, next) => {
   }
 });
 
-authorsRouter.put("/:authorId", async (req, res, next) => {
-  try {
-    const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
-      req.params.authorId,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (updatedAuthor) res.send(updatedAuthor);
-    else
-      next(
-        createHttpError(404, `Author with id ${req.params.authorId} not found!`)
+authorsRouter.put(
+  "/:authorId",
+  basicAuth,
+  adminOnly,
+  async (req, res, next) => {
+    try {
+      const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
+        req.params.authorId,
+        req.body,
+        { new: true, runValidators: true }
       );
-  } catch (error) {
-    next(error);
+      if (updatedAuthor) res.send(updatedAuthor);
+      else
+        next(
+          createHttpError(
+            404,
+            `Author with id ${req.params.authorId} not found!`
+          )
+        );
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-authorsRouter.delete("/:authorId", async (req, res, next) => {
-  try {
-    const deletedAuthor = await AuthorsModel.findByIdAndDelete(
-      req.params.authorId
-    );
-    if (deletedAuthor) res.status(204).send();
-    else
-      next(
-        createHttpError(404, `Author with id ${req.params.authorId} not found!`)
+authorsRouter.delete(
+  "/:authorId",
+  basicAuth,
+  adminOnly,
+  async (req, res, next) => {
+    try {
+      const deletedAuthor = await AuthorsModel.findByIdAndDelete(
+        req.params.authorId
       );
-  } catch (error) {
-    next(error);
+      if (deletedAuthor) res.status(204).send();
+      else
+        next(
+          createHttpError(
+            404,
+            `Author with id ${req.params.authorId} not found!`
+          )
+        );
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 export default authorsRouter;
