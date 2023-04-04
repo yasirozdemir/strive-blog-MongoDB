@@ -1,7 +1,9 @@
-import Express from "Express";
+import Express from "express";
 import createHttpError from "http-errors";
 import AuthorsModel from "./model.js";
 import q2m from "query-to-mongo";
+import { basicAuth } from "../../lib/auth/basicAuth.js";
+import { adminOnly } from "../../lib/auth/admin.js";
 
 const authorsRouter = Express.Router();
 
@@ -17,7 +19,7 @@ authorsRouter.post("/", async (req, res, next) => {
   }
 });
 
-authorsRouter.get("/", async (req, res, next) => {
+authorsRouter.get("/", basicAuth, adminOnly, async (req, res, next) => {
   try {
     const queryToMongo = q2m(req.query);
     const authors = await AuthorsModel.find(

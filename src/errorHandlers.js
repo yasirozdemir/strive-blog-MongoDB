@@ -14,19 +14,27 @@ export const badRequestHandler = (err, req, res, next) => {
 };
 
 export const unauthorizedHandler = (err, req, res, next) => {
-  if (err.status === 401) {
+  if (err.status === 401)
     res.status(401).send({
       message: err.message,
     });
-  } else next(err);
+  else next(err);
+};
+
+export const forbiddenHandler = (err, req, res, next) => {
+  if (err.status === 403)
+    res.status(403).send({
+      message: err.message,
+    });
+  else next(err);
 };
 
 export const notFoundHandler = (err, req, res, next) => {
-  if (err.status === 404) {
+  if (err.status === 404)
     res.status(404).send({
       message: err.message,
     });
-  } else next(err);
+  else next(err);
 };
 
 export const genericErrorHandler = (err, req, res, next) => {

@@ -7,6 +7,7 @@ import {
   unauthorizedHandler,
   notFoundHandler,
   genericErrorHandler,
+  forbiddenHandler,
 } from "./errorHandlers.js";
 import blogpostsRouter from "./api/blogposts/index.js";
 import authorsRouter from "./api/authors/index.js";
@@ -22,6 +23,7 @@ server.use("/blogposts", blogpostsRouter);
 
 server.use(badRequestHandler);
 server.use(unauthorizedHandler);
+server.use(forbiddenHandler);
 server.use(notFoundHandler);
 server.use(genericErrorHandler);
 
@@ -29,7 +31,7 @@ mongoose.connect(process.env.MONGO_URL);
 
 mongoose.connection.on("connected", () => {
   server.listen(port, () => {
-    console.table(listEndpoints(server));
+    // console.table(listEndpoints(server));
     console.log(`✅ Server is running on port ${port}`);
   });
 });
