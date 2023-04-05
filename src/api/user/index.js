@@ -3,8 +3,28 @@ import { basicAuth } from "../../lib/auth/basicAuth.js";
 import AuthorsModel from "../authors/model.js";
 import BlogpostsModel from "../blogposts/model.js";
 import createHttpError from "http-errors";
+import { createTokens } from "../../lib/auth/tools.js";
 
 const UserRouter = Express.Router();
+
+UserRouter.post("/me/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const author = await AuthorsModel.checkCreditentials(email, password);
+    if (author) {
+      const { accessToken, refreshToken } = await createTokens(author);
+      res.send({
+        message: "You've successfully logged in!",
+        accessToken,
+        refreshToken,
+      });
+    } else {
+      next(createHttpError(401, "Creditentials are not ok!"));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 UserRouter.get("/me", basicAuth, async (req, res, next) => {
   try {

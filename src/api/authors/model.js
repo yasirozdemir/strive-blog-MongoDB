@@ -15,6 +15,7 @@ const AuthorsSchema = new Schema(
       enum: ["admin", "user"],
       default: "user",
     },
+    refreshToken: { type: String },
   },
   { timestamps: true }
 );
@@ -32,6 +33,7 @@ AuthorsSchema.methods.toJSON = function () {
   const author = this.toObject();
   delete author.password;
   delete author.__v;
+  delete author.refreshToken;
   return author;
 };
 
