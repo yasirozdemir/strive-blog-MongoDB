@@ -8,7 +8,7 @@ const AuthorsSchema = new Schema(
     surname: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, reqired: true },
-    avatar: { type: String, required: true },
+    avatar: { type: String, required: true, default: " " },
     role: {
       type: String,
       required: true,
