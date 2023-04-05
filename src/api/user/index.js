@@ -4,6 +4,7 @@ import AuthorsModel from "../authors/model.js";
 import BlogpostsModel from "../blogposts/model.js";
 import createHttpError from "http-errors";
 import { createTokens } from "../../lib/auth/tools.js";
+import { JWTokenAuth } from "../../lib/auth/tokenAuth.js";
 
 const UserRouter = Express.Router();
 
@@ -26,15 +27,18 @@ UserRouter.post("/me/login", async (req, res, next) => {
   }
 });
 
-UserRouter.get("/me", basicAuth, async (req, res, next) => {
+UserRouter.get("/me", JWTokenAuth, async (req, res, next) => {
   try {
-    res.send(req.author);
+    const author = await AuthorsModel.findById(req.author._id);
+    if (author) res.send(author);
+    else
+      next(createHttpError(404, `Author with id ${req.author._id} not found!`));
   } catch (error) {
     next(error);
   }
 });
 
-UserRouter.put("/me", basicAuth, async (req, res, next) => {
+UserRouter.put("/me", JWTokenAuth, async (req, res, next) => {
   try {
     const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
       req.author._id,
@@ -47,7 +51,7 @@ UserRouter.put("/me", basicAuth, async (req, res, next) => {
   }
 });
 
-UserRouter.delete("/me", basicAuth, async (req, res, next) => {
+UserRouter.delete("/me", JWTokenAuth, async (req, res, next) => {
   try {
     await AuthorsModel.findByIdAndDelete(req.author._id);
     res.status(204).send();
@@ -56,7 +60,7 @@ UserRouter.delete("/me", basicAuth, async (req, res, next) => {
   }
 });
 
-UserRouter.get("/me/blogposts", basicAuth, async (req, res, next) => {
+UserRouter.get("/me/blogposts", JWTokenAuth, async (req, res, next) => {
   try {
     const blogposts = await BlogpostsModel.find({ author: req.author._id });
     if (blogposts) res.send(blogposts);
@@ -68,7 +72,7 @@ UserRouter.get("/me/blogposts", basicAuth, async (req, res, next) => {
 
 UserRouter.get(
   "/me/blogposts/:blogpostId",
-  basicAuth,
+  JWTokenAuth,
   async (req, res, next) => {
     try {
       const blogpost = await BlogpostsModel.findOne({
@@ -85,7 +89,7 @@ UserRouter.get(
 
 UserRouter.put(
   "/me/blogposts/:blogpostId",
-  basicAuth,
+  JWTokenAuth,
   async (req, res, next) => {
     try {
       const updatedBlogPost = await BlogpostsModel.findOneAndUpdate(
@@ -106,7 +110,7 @@ UserRouter.put(
 
 UserRouter.delete(
   "/me/blogposts/:blogpostId",
-  basicAuth,
+  JWTokenAuth,
   async (req, res, next) => {
     try {
       const deleted = await BlogpostsModel.findOneAndUpdate({

@@ -31,7 +31,6 @@ AuthorsSchema.pre("save", async function () {
 
 AuthorsSchema.methods.toJSON = function () {
   const author = this.toObject();
-  delete author.password;
   delete author.__v;
   delete author.refreshToken;
   return author;

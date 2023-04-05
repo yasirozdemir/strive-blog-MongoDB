@@ -5,7 +5,7 @@ export const JWTokenAuth = async (req, res, next) => {
   if (!req.headers.authorization)
     next(createHttpError(401, "Please provide a Bearer token!"));
   else {
-    const accessToken = req.headers.authorization.split(" ")[1];
+    const accessToken = req.headers.authorization.replace("Bearer ", "");
     try {
       const payload = await verifyAccessToken(accessToken);
       req.author = { _id: payload._id, role: payload.role };

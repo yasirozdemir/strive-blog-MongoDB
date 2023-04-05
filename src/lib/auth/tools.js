@@ -28,7 +28,7 @@ export const verifyAccessToken = (token) =>
   new Promise((resolve, reject) =>
     jwt.verify(token, JWT_KEY, (err, payload) => {
       if (err) reject(err);
-      else resolve(token);
+      else resolve(payload);
     })
   );
 

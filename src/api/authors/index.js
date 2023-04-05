@@ -4,7 +4,6 @@ import AuthorsModel from "./model.js";
 import q2m from "query-to-mongo";
 import { basicAuth } from "../../lib/auth/basicAuth.js";
 import { adminOnly } from "../../lib/auth/admin.js";
-import { JWTokenAuth } from "../../lib/auth/tokenAuth.js";
 
 const authorsRouter = Express.Router();
 
