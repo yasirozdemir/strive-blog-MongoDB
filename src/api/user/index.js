@@ -1,5 +1,4 @@
 import Express from "express";
-import { basicAuth } from "../../lib/auth/basicAuth.js";
 import AuthorsModel from "../authors/model.js";
 import BlogpostsModel from "../blogposts/model.js";
 import createHttpError from "http-errors";

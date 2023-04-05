@@ -16,8 +16,23 @@ import UserRouter from "./api/user/index.js";
 const server = Express();
 const port = process.env.PORT || 3001;
 
-server.use(cors());
 server.use(Express.json());
+
+const whiteList = [process.env.FE_DEV_URL, process.env.FE_PROD_URL];
+
+const corsOpt = {
+  origin: (currentOrigin, corsNext) => {
+    if (!currentOrigin || whiteList.indexOf(currentOrigin) !== -1) {
+      corsNext(null, true);
+    } else {
+      corsNext(
+        createHttpError(400, `Origin ${currentOrigin} is not in the whitelist!`)
+      );
+    }
+  },
+};
+
+server.use(cors(corsOpt));
 
 server.use("/authors", UserRouter);
 server.use("/authors", authorsRouter);
