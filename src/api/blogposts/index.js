@@ -4,11 +4,12 @@ import BlogpostsModel from "./model.js";
 import q2m from "query-to-mongo";
 import { basicAuth } from "../../lib/auth/basicAuth.js";
 import { adminOnly } from "../../lib/auth/admin.js";
+import { JWTokenAuth } from "../../lib/auth/tokenAuth.js";
 
 const blogpostsRouter = Express.Router();
 
 // POST
-blogpostsRouter.post("/", basicAuth, async (req, res, next) => {
+blogpostsRouter.post("/", JWTokenAuth, async (req, res, next) => {
   try {
     const newBlogpost = new BlogpostsModel({
       ...req.body,
