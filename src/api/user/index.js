@@ -4,8 +4,28 @@ import BlogpostsModel from "../blogposts/model.js";
 import createHttpError from "http-errors";
 import { createTokens } from "../../lib/auth/tools.js";
 import { JWTokenAuth } from "../../lib/auth/tokenAuth.js";
+import passport from "passport";
 
 const UserRouter = Express.Router();
+
+UserRouter.get(
+  "/me/googleLogin",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+UserRouter.get(
+  "/me/googleRedirect",
+  passport.authenticate("google", { session: false }),
+  (req, res, next) => {
+    try {
+      res.redirect(
+        `${process.env.FE_DEV_URL}?accessToken=${req.user.accessToken}`
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 UserRouter.post("/me/login", async (req, res, next) => {
   try {

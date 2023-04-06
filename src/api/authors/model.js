@@ -9,6 +9,7 @@ const AuthorsSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String, reqired: true },
     avatar: { type: String, required: true, default: " " },
+    googleId: { type: String },
     role: {
       type: String,
       required: true,

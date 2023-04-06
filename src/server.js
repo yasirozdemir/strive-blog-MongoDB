@@ -2,6 +2,8 @@ import Express from "express";
 import listEndpoints from "express-list-endpoints";
 import cors from "cors";
 import mongoose from "mongoose";
+import passport from "passport";
+import googleStrategy from "./lib/auth/googleOauth.js";
 import {
   badRequestHandler,
   unauthorizedHandler,
@@ -15,6 +17,8 @@ import UserRouter from "./api/user/index.js";
 
 const server = Express();
 const port = process.env.PORT || 3001;
+
+passport.use("google", googleStrategy);
 
 server.use(Express.json());
 
@@ -33,6 +37,7 @@ const corsOpt = {
 };
 
 server.use(cors(corsOpt));
+server.use(passport.initialize());
 
 server.use("/authors", UserRouter);
 server.use("/authors", authorsRouter);
